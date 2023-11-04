@@ -22,8 +22,8 @@ public class SwipeWeapon : MonoBehaviour
         float xLookImput = Input.GetAxisRaw("Mouse X");
         float yLookImput = Input.GetAxisRaw("Mouse Y");
 
-        Quaternion xAngleAdjust = Quaternion.AngleAxis(-xLookImput * 1.45f, Vector3.up);
-        Quaternion yAngleAdjust = Quaternion.AngleAxis(yLookImput * 1.45f, Vector3.right);
+        Quaternion xAngleAdjust = Quaternion.AngleAxis(-xLookImput * 1.75f, Vector3.up);
+        Quaternion yAngleAdjust = Quaternion.AngleAxis(yLookImput * 1.75f, Vector3.right);
         Quaternion targetFinalLocation = originalRotation * xAngleAdjust * yAngleAdjust;
 
         transform.localRotation = Quaternion.Lerp(transform.localRotation, targetFinalLocation, Time.deltaTime * 10f);

@@ -2,30 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using Proyect.Scripts.Models;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlayerController : MonoBehaviour
 {
-    private Player player;
-
-    public PlayerController Instance { get; private set; }
+    private Player _player;
+    public static bool CanSpawnEnemies { get; set; }
+    public static PlayerController Instance { get; private set; }
 
     // Start is called before the first frame update
     void Start()
     {
-        player = new Player();
+        _player = new Player();
     }
 
     /*
      * This method is called when the player takes an object
      * and it applies some buff.
      */
-    void BufFNerf(float percent, string type, int timeOutSeconds, bool buff = true)
+    public void BufFNerf(float percent, string type, int timeOutSeconds, bool buff = true)
     {
-        player.BuffNerf(buff, percent, type);
+        _player.BuffNerf(buff, percent, type);
         StartCoroutine(WaitForNerf(timeOutSeconds, percent, type));
     }
 
-    void TakeDamage(float damage, string type, int timeOutSeconds = 0)
+    public void TakeDamage(float damage, string type, int timeOutSeconds = 0)
     {
         if (type == "toxic")
         {
@@ -33,13 +34,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            player.TakeDamage(damage);
+            _player.TakeDamage(damage);
         }
     }
 
-    bool TakeHeal(float heal, int timeOutSeconds = 0)
+    public bool TakeHeal(float heal, int timeOutSeconds = 0)
     {
-        if (player.CanHealth)
+        if (_player.CanHealth)
         {
             StartCoroutine(LifeInTime(timeOutSeconds, heal, false));
             return true;
@@ -52,14 +53,14 @@ public class PlayerController : MonoBehaviour
      * data is the amount of damage or healing.
      * If type is true, the player is healing, otherwise is taking damage
      */
-    IEnumerator LifeInTime(int timeOutSeconds, float data, bool type)
+    private IEnumerator LifeInTime(int timeOutSeconds, float data, bool type)
     {
         int actualTime = 0;
         if (type)
         {
             while (actualTime == timeOutSeconds)
             {
-                player.Healing(data);
+                _player.Healing(data);
                 actualTime += 1;
                 yield return new WaitForSeconds(0.3f);
             }
@@ -68,7 +69,7 @@ public class PlayerController : MonoBehaviour
         {
             while (actualTime == timeOutSeconds)
             {
-                player.TakeDamage(data);
+                _player.TakeDamage(data);
                 actualTime += 1;
                 yield return new WaitForSeconds(0.3f);
             }
@@ -78,9 +79,23 @@ public class PlayerController : MonoBehaviour
     /*
      * This methos is called to wait for seconds til the nerf is over.
      */
-    IEnumerator WaitForNerf(int timeOutSeconds, float percent, string type)
+    private IEnumerator WaitForNerf(int timeOutSeconds, float percent, string type)
     {
         yield return new WaitForSeconds(timeOutSeconds);
-        player.BuffNerf(false, percent, type);
+        _player.BuffNerf(false, percent, type);
+    }
+    
+    public void Awake()
+    {
+        Assert.IsNull(Instance, $"Multiple instances of {nameof(Instance)} detected. This should not happen.");
+        if (Instance == null)
+        {
+            Instance = this;
+            Debug.Log("Player created");
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

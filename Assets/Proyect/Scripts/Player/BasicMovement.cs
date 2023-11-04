@@ -30,6 +30,8 @@ public class BasicMovement : MonoBehaviour
     Vector3 moveDirection;
 
     Rigidbody rb;
+    
+    private PlayerController _playerController;
 
     // Start is called before the first frame update
     void Start()
@@ -63,6 +65,29 @@ public class BasicMovement : MonoBehaviour
             rb.drag = 0;
         }
         PlayerMovement();
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        Debug.Log(other.gameObject.name);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        switch (other.gameObject.name)
+        {
+            case "PotionChangeWeapon":
+                break;
+            case "BuffEnemy":
+                break;
+            case "Speed":
+                break;
+            case "Damage":
+                break;
+            case "GraveyardPointer":
+                PlayerController.CanSpawnEnemies = true;
+                break;
+        }
     }
 
     private void InputMovement()
